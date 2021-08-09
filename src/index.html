@@ -6,9 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PomoTimebox</title>
   </head>
-  <body>
-    <header></header>
-    <main>
+  <body class="bg-red-200">
+    <main class="container h-screen mx-auto flex flex-row justify-center items-center space-x-24">
+      <div class="flex flex-col justify-center items-center space-y-4 mb-4">
+        <p class="label text-4xl text-red-800">Focus</p>
+        <div
+          id="timer"
+          class="box-border bg-red-100 text-red-800 outline-none border-4 border-red-100 rounded-full"
+        >
+          <div id="focus-timer" class="p-20 text-7xl">
+            50:00
+          </div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
+          <button
+            id="start-stop-btn"
+            class="text-lg px-3 py-1 bg-red-100 rounded-md hover:bg-red-200 border-2 border-red-100"
+          >Start</button>
+          <button
+            id="focus-rest-btn"
+            class="text-lg px-3 py-1 bg-red-100 border-2 rounded-md hover:bg-red-200 border-red-100"
+          >Rest</button>
+        </div>
+      </div>
+
       <iframe
         width="560"
         height="315"
