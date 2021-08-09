@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "start": "serve dist"
+    "start": "serve dist",
+    "lint": "eslint src/ --ext .ts --fix"
   },
   "repository": {
     "type": "git",
@@ -20,7 +21,10 @@
   "homepage": "https://github.com/mariiakornieva/pomo-timebox#readme",
   "devDependencies": {
     "@types/lodash": "^4.14.172",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
     "css-loader": "^6.2.0",
+    "eslint": "^7.32.0",
     "html-webpack-plugin": "^5.3.2",
     "serve": "^12.0.0",
     "style-loader": "^3.2.1",
