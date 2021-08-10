@@ -1,15 +1,18 @@
-import * as _ from 'lodash';
 import './style.css';
 
-const SEC_IN_MIN = 60;
-const FOCUS_TIMEOUT = 50 * SEC_IN_MIN;
-const REST_TIMEOUT = 10 * SEC_IN_MIN;
+const FOCUS_TIMEOUT_MIN = 1;
+const REST_TIMEOUT_MIN = 10;
+
+const FOCUS = 'Focus';
+const REST = 'Rest';
+
+const sound = new Audio('../assets/audio/stop-focus-sound.flac');
 
 const timer = document.getElementById('focus-timer');
+const label = document.getElementById('label');
 const startStopButton = document.getElementById('start-stop-btn');
-// const focusRestButton = document.getElementById();
+const focusRestButton = document.getElementById('focus-rest-btn');
 
-const isInProgress = false;
 let timerId: NodeJS.Timer;
 
 type Time = {
@@ -17,11 +20,42 @@ type Time = {
   sec: number;
 };
 
-const decrementTimeout = (time: Time): Time => {
+const onTimeout = () => {
+  if (!timer) {
+    return;
+  }
+
+  const currentTime = timer.textContent;
+
+  if (!currentTime) {
+    clearInterval(timerId);
+    return;
+  }
+
+  const min = parseInt(currentTime);
+  const sec = Number(currentTime.slice(currentTime.indexOf(':') + 1));
+
+  if (min + sec === 0) {
+    clearInterval(timerId);
+    if (startStopButton) {
+      startStopButton.textContent = 'Start';
+    }
+
+    sound.play();
+
+    return;
+  }
+
+  const newTime = decrementTimeout({ min, sec });
+  timer.textContent =
+    `${newTime.min}`.padStart(2, '0') + ':' + `${newTime.sec}`.padStart(2, '0');
+};
+
+export const decrementTimeout = (time: Time): Time => {
   if (time.sec === 0) {
     return {
       min: time.min - 1,
-      sec: 99,
+      sec: 59,
     };
   }
 
@@ -32,35 +66,81 @@ const decrementTimeout = (time: Time): Time => {
 };
 
 const onStartStop = (event: Event) => {
-  if (isInProgress) {
-    clearInterval(timerId);
-
+  if (!startStopButton) {
     return;
   }
 
-  timerId = setInterval(() => {
-    if (!timer) {
-      return;
-    }
+  if (startStopButton.textContent === 'Stop') {
+    clearInterval(timerId);
+    startStopButton.textContent = 'Start';
+    return;
+  }
 
-    const currentTime = timer.textContent;
+  startStopButton.textContent = 'Stop';
+  timerId = setInterval(onTimeout, 1000);
+};
 
-    if (!currentTime) {
-      clearInterval(timerId);
-      return;
-    }
+const onFocusRest = (event: Event) => {
+  if (!focusRestButton) {
+    return;
+  }
 
-    const min = parseInt(currentTime);
-    const sec = Number(currentTime.slice(currentTime.indexOf(':') + 1));
+  if (!startStopButton) {
+    return;
+  }
 
-    if (min + sec <= 1) {
-      clearInterval(timerId);
-      return;
-    }
+  sound.pause();
+  sound.currentTime = 0;
 
-    const newTime = decrementTimeout({ min, sec });
-    timer.textContent = `${newTime.min}:${newTime.sec}`;
-  }, 1000);
+  clearInterval(timerId);
+  startStopButton.textContent = 'Start';
+
+  document.body.classList.toggle('bg-red-200');
+  document.body.classList.toggle('bg-blue-200');
+
+  if (!timer) {
+    return;
+  }
+
+  timer.classList.toggle('bg-red-100');
+  timer.classList.toggle('bg-blue-100');
+  timer.classList.toggle('text-red-800');
+  timer.classList.toggle('text-blue-800');
+  timer.classList.add('rounded-full');
+  timer.classList.add('shadow-inner');
+
+  if (focusRestButton.textContent === REST) {
+    timer.textContent = `${REST_TIMEOUT_MIN}`.padStart(2, '0') + ':00';
+    onRest();
+  } else {
+    timer.textContent = `${FOCUS_TIMEOUT_MIN}`.padStart(2, '0') + ':00';
+    onFocus();
+  }
+};
+
+const onRest = () => {
+  if (label) {
+    label.textContent = REST;
+    label.classList.toggle('text-red-800');
+    label.classList.toggle('text-blue-800');
+  }
+
+  if (focusRestButton) {
+    focusRestButton.textContent = FOCUS;
+  }
+};
+
+const onFocus = () => {
+  if (label) {
+    label.textContent = FOCUS;
+    label.classList.toggle('text-red-800');
+    label.classList.toggle('text-blue-800');
+  }
+
+  if (focusRestButton) {
+    focusRestButton.textContent = REST;
+  }
 };
 
 startStopButton?.addEventListener('click', onStartStop);
+focusRestButton?.addEventListener('click', onFocusRest);
